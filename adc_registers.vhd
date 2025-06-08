@@ -6,17 +6,22 @@ use work.common.all;
 
 entity adc_reg is
   generic (
-    C_SCOPE            : integer  := 16#D#;
-    C_REG_ADC_STATUS   : integer  := 16#100#; -- RO
-    C_REG_ADC_LOOK     : integer  := 16#104#; -- RO
-    C_REG_ADC_LAST     : integer  := 16#108#; -- RO
-    C_REG_ADC_STATE    : integer  := 16#10C#; -- RO
-    C_REG_ADC_CONFIG   : integer  := 16#110#; -- RW
-    C_REG_ADC_CLKPAR   : integer  := 16#114#; -- RW
-    C_REG_ADC_COMMAND  : integer  := 16#118#; -- RW
-    C_REG_ADC_SCRATCH  : integer  := 16#200#; -- RW
-    C_REG_ADC_ROA      : integer  := 16#204#; -- RO
-    C_VAL_ADC_ROA      : integer  := 16#1234ABCD#
+    C_SCOPE               : integer  := 16#D#;
+
+    --C_REG_ADC_COMMANDS    : integer  := 16#000#;
+    
+    C_REG_ADC_LOOK        : integer  := 16#100#; -- RO
+    --C_REG_RISING_EDGE     : integer  := 16#104#; -- RO
+    --C_REG_FALLING_EDGE    : integer  := 16#108#; -- RO
+    
+    C_REG_ADC_CONFIG      : integer  := 16#200#; -- RW
+    C_REG_ADC_TEST_RANGE  : integer  := 16#204#; -- RW
+    --C_REG_BRAM_CONFIG     : integer  := 16#208#; -- RW
+    --C_REG_ADC_TRIG_CONFIG : integer  := 16#20C#; -- RW
+
+    C_REG_ADC_SCRATCH     : integer  := 16#300#; -- RW
+    C_REG_ADC_ROA         : integer  := 16#304#; -- RO
+    C_VAL_ADC_ROA         : integer  := 16#1234ABCD#
     );
   port (
     ACLK	        : in std_logic;
@@ -32,13 +37,16 @@ entity adc_reg is
     S_REGBUS_RB_WDATA	: in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     S_REGBUS_RB_WACK    : out std_logic;
 
-    CONFIG_O            : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-    CLKPAR_O            : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-    COMMAND_O           : out std_logic_vector(7 downto 0);
-    STATUS_I            : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-    STATE_I             : in  std_logic_vector(3 downto 0);
-    LAST_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-    LOOK_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
+    ADC_CONFIG_O        : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    ADC_TEST_RANGE_O    : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    --ADC_TRIG_CONFIG_O   : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    --BRAM_CONFIG_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+
+    ADC_LOOK_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
+    --COMMAND_O           : out std_logic_vector(7 downto 0);
+    --STATUS_I            : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    --STATE_I             : in  std_logic_vector(3 downto 0);
+    --LAST_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     );
 end entity adc_reg;
 
@@ -57,8 +65,8 @@ architecture behavioral of adc_reg is
   signal wack     : std_logic := '0';
 
   -- registers
-  signal config   : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
-  signal clkpar   : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal adc_config   : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal test_range   : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
   signal scratch  : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
   signal command  : std_logic_vector(7 downto 0) := (others => '0');
   signal state    : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
@@ -69,6 +77,8 @@ begin
   rst       <= not ARESETN;
 
   --output registers
+  ADC_CONFIG_O     <= 
+  ADC_TEST_RANGE_O <= 
   CONFIG_O  <= config;
   CLKPAR_O  <= clkpar;
   COMMAND_O <= command;

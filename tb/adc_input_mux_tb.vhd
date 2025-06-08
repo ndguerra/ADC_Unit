@@ -7,42 +7,60 @@ library work;
 use work.common.all;
 
 --  Defines a testbench (without any ports)
-entity adc_trans_tb is
-end adc_trans_tb;
+entity adc_input_mux_tb is
+end adc_input_mux_tb;
 
-architecture behaviour of adc_trans_tb is
-  component adc_trans is
+architecture behaviour of adc_input_mux_tb is
+  component adc_input_mux is
     port (
-      ACLK           : in  std_logic;
+      ACLK            : in  std_logic;
+      ARESETN         : in  std_logic;
+      
+      ADC_DATA_I      : in  std_logic_vector(ADC_DATA_WIDTH downto 0);
+      INT_DATA_O      : out std_logic_vector(ADC_DATA_WIDTH downto 0);
+      ADC_LOOK_O          : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+      ADC_EN_O        : out std_logic;
 
-      ADC_DATA_I     : in  std_logic_vector(ADC_DATA_WIDTH downto 0);
-      CONFIG_I       : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-
-      ADC_DATA_O     : out std_logic_vector(ADC_DATA_WIDTH downto 0);
-      LOOK_O     : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
+      ADC_TEST_RANGE_I : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+      ADC_CONFIG_I     : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
     );
   end component;
-  signal count     : integer := 0;
-  signal aclk      : std_logic;
-  signal config    : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
-  signal look      : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+  signal count      : integer := 0;
+  signal aclk       : std_logic;
+  signal aresetn    : std_logic;
+  
+  signal config     : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal test_range : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal look       : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
 
-  signal do        : std_logic_vector(ADC_DATA_WIDTH downto 0);
-  signal di        : std_logic_vector(ADC_DATA_WIDTH-1 downto 0) := (others => '0');
-  signal diof      : std_logic := '0';
-  signal data_i    : std_logic_vector(ADC_DATA_WIDTH downto 0);
+  signal data_o     : std_logic_vector(12 downto 0) := (others => '0');
+  signal data_i     : std_logic_vector(12 downto 0) := (others => '0');
+  signal di         : std_logic_vector(11 downto 0) := (others => '0');
+  signal diof       : std_logic := '0';
+
+  signal adc_en     : std_logic;
 begin
-  uut: adc_trans port map (
-    ACLK         => aclk,      
-    ADC_DATA_I   => data_i,
-    CONFIG_I     => config,
-    ADC_DATA_O   => do,
-    LOOK_O       => look
+  uut: adc_input_mux port map (
+    ACLK             => aclk,
+    ARESETN          => aresetn,
+    ADC_DATA_I       => data_i,
+    INT_DATA_O       => data_o,
+    ADC_LOOK_O       => look,
+    ADC_EN_O         => adc_en,
+    ADC_TEST_RANGE_I => test_range,
+    ADC_CONFIG_I     => config
   );
 
   data_i(11 downto 0) <= di;
   data_i(12)          <= diof;
 
+  aresetn_process : process
+  begin
+    aresetn <= '0';
+    wait for 12 ns;
+    aresetn <= '1';    
+    wait;
+  end process;
   
   aclk_process : process
   begin
@@ -56,9 +74,12 @@ begin
   config_in : process
   begin
     wait for 18 ns;
-    config <= x"00000004";
+    test_range <= x"11000F00";
+    config     <= x"00008000";
     wait for 70 ns;
-    config <= x"00000000";
+    config     <= x"0001BFF0";
+    --wait for 70 ns;
+    --config     <= x"00016005";
     wait;
   end process;
 
