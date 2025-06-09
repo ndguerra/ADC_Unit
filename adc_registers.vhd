@@ -39,14 +39,14 @@ entity adc_reg is
 
     ADC_CONFIG_O        : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     ADC_TEST_RANGE_O    : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-    --ADC_TRIG_CONFIG_O   : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    ADC_TRIG_CONFIG_O   : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     BRAM_CONFIG_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
 
-    ADC_LOOK_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
-    --COMMAND_O           : out std_logic_vector(7 downto 0);
-    --STATUS_I            : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    ADC_LOOK_I          : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    STATUS_I            : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    LAST_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
     --STATE_I             : in  std_logic_vector(3 downto 0);
-    --LAST_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    --COMMAND_O           : out std_logic_vector(7 downto 0);
     );
 end entity adc_reg;
 

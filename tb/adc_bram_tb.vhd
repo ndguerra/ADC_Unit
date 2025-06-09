@@ -45,7 +45,7 @@ architecture behaviour of adc_bram_tb is
   signal last      : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
   signal wen       : std_logic_vector(3 downto 0);
   signal addr      : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
-  signal do        : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);  
+  signal do        : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
 
 begin
   uut: adc_bram port map (
