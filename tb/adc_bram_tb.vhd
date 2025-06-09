@@ -7,53 +7,63 @@ library work;
 use work.common.all;
 
 --  Defines a testbench (without any ports)
-entity adc_input_mux_tb is
-end adc_input_mux_tb;
-
-architecture behaviour of adc_input_mux_tb is
-  component adc_input_mux is
+entity adc_bram_tb is
+end adc_bram_tb;
+     
+architecture behaviour of adc_bram_tb is
+  component adc_bram is
     port (
-      ACLK             : in  std_logic;
-      ARESETN          : in  std_logic;
-      
-      ADC_DATA_I       : in  std_logic_vector(ADC_DATA_WIDTH downto 0);
-      INT_DATA_O       : out std_logic_vector(ADC_DATA_WIDTH downto 0);
-      ADC_LOOK_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-      ADC_EN_O         : out std_logic;
+      ACLK           : in  std_logic;
+      ARESETN        : in  std_logic;
 
-      ADC_TEST_RANGE_I : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-      ADC_CONFIG_I     : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
+      VALID_I        : in  std_logic;
+      INT_DATA_I     : in  std_logic_vector(ADC_DATA_WIDTH downto 0);
+      
+      -- REGISTER
+      BRAM_CONFIG_I  : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+      STATUS_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+      LAST_O         : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+      
+      -- BRAM
+      BRAM_EN_O      : out std_logic; 
+      BRAM_DATA_O    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
+      BRAM_WEN_O     : out std_logic_vector(3 downto 0);
+      BRAM_ADDR_O    : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+      BRAM_CLK_O     : out std_logic;
+      BRAM_RST_O     : out std_logic
     );
   end component;
-  signal count      : integer := 0;
-  signal aclk       : std_logic;
-  signal aresetn    : std_logic;
-  
-  signal config     : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
-  signal test_range : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
-  signal look       : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal count     : integer := 0;
+  signal aclk      : std_logic;
+  signal aresetn   : std_logic;
+  signal valid     : std_logic := '1';
+  signal data_i    : std_logic_vector(ADC_DATA_WIDTH downto 0);
+  signal di        : std_logic_vector(ADC_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal diof      : std_logic := '0';
+  signal config    : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal stat      : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+  signal last      : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+  signal wen       : std_logic_vector(3 downto 0);
+  signal addr      : std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
+  signal do        : std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);  
 
-  signal data_o     : std_logic_vector(12 downto 0) := (others => '0');
-  signal data_i     : std_logic_vector(12 downto 0) := (others => '0');
-  signal di         : std_logic_vector(11 downto 0) := (others => '0');
-  signal diof       : std_logic := '0';
-
-  signal adc_en     : std_logic;
 begin
-  uut: adc_input_mux port map (
-    ACLK             => aclk,
-    ARESETN          => aresetn,
-    ADC_DATA_I       => data_i,
-    INT_DATA_O       => data_o,
-    ADC_LOOK_O       => look,
-    ADC_EN_O         => adc_en,
-    ADC_TEST_RANGE_I => test_range,
-    ADC_CONFIG_I     => config
-  );
+  uut: adc_bram port map (
+      ACLK          => aclk,
+      ARESETN       => aresetn,
+      VALID_I       => valid,
+      INT_DATA_I    => data_i,
+      BRAM_CONFIG_I => config,
+      STATUS_O      => stat,
+      LAST_O        => last,
+      BRAM_DATA_O   => do,
+      BRAM_WEN_O    => wen,
+      BRAM_ADDR_O   => addr
+      );
 
   data_i(11 downto 0) <= di;
   data_i(12)          <= diof;
-
+  
   aresetn_process : process
   begin
     aresetn <= '0';
@@ -74,12 +84,13 @@ begin
   config_in : process
   begin
     wait for 18 ns;
-    test_range <= x"11000F00";
-    config     <= x"00008000";
-    wait for 70 ns;
-    config     <= x"0001BFF0";
-    --wait for 70 ns;
-    --config     <= x"00016005";
+    config <= x"00010010";
+    wait for 30 ns;
+    config <= x"00011008";
+    wait for 100 ns;
+    config <= x"00012004";
+    wait for 100 ns;
+    config <= x"00013002";
     wait;
   end process;
 
@@ -87,7 +98,7 @@ begin
   begin
     di     <= x"000";
     diof   <= '0';
-    wait for 22 ns;
+    wait for 18 ns;
     di     <= x"111";
     diof   <= '0';
     wait for 10 ns;

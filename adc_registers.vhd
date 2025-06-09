@@ -16,7 +16,7 @@ entity adc_reg is
     
     C_REG_ADC_CONFIG      : integer  := 16#200#; -- RW
     C_REG_ADC_TEST_RANGE  : integer  := 16#204#; -- RW
-    --C_REG_BRAM_CONFIG     : integer  := 16#208#; -- RW
+    C_REG_BRAM_CONFIG     : integer  := 16#208#; -- RW
     --C_REG_ADC_TRIG_CONFIG : integer  := 16#20C#; -- RW
 
     C_REG_ADC_SCRATCH     : integer  := 16#300#; -- RW
@@ -40,7 +40,7 @@ entity adc_reg is
     ADC_CONFIG_O        : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     ADC_TEST_RANGE_O    : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     --ADC_TRIG_CONFIG_O   : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-    --BRAM_CONFIG_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+    BRAM_CONFIG_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
 
     ADC_LOOK_I              : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
     --COMMAND_O           : out std_logic_vector(7 downto 0);
