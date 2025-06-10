@@ -20,26 +20,34 @@ architecture behaviour of adc_valid_tb is
       ADC_VALID_CONFIG_I : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
 
       RISING_EDGE_I      : in  std_logic;
-      FALLING_EDGE_I     : in  std_logic
-    );
+      FALLING_EDGE_I     : in  std_logic;
+
+      RISING_COUNT_O     : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
+      FALLING_COUNT_O    : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
+      );
   end component;
   signal count      : integer := 0;
   signal aclk       : std_logic;
   signal aresetn    : std_logic;
   
   signal config     : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
-  signal fall       : std_logic := '0';
-  signal rise       : std_logic := '0';
+  signal fall_e     : std_logic := '0';
+  signal rise_e     : std_logic := '0';
 
   signal valid      : std_logic;
+  signal r_cnt      : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal f_cnt      : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+
 begin
   uut: adc_valid port map (
     ACLK               => aclk,
     ARESETN            => aresetn,
     ADC_VALID_CONFIG_I => config,
-    RISING_EDGE_I      => rise,
-    FALLING_EDGE_I     => fall,
-    VALID_O            => valid
+    RISING_EDGE_I      => rise_e,
+    FALLING_EDGE_I     => fall_e,
+    VALID_O            => valid,
+    RISING_COUNT_O     => r_cnt,
+    FALLING_COUNT_O    => f_cnt
   );
 
 
@@ -70,21 +78,21 @@ begin
   edges_in : process
   begin
     wait for 21 ns;
-    rise  <= '1';
+    rise_e  <= '1';
     wait for 10 ns;
-    rise  <= '0';
+    rise_e  <= '0';
     wait for 30 ns;
-    fall  <= '1';
+    fall_e  <= '1';
     wait for 10 ns;
-    fall  <= '0';
+    fall_e  <= '0';
     wait for 40 ns;
-    fall  <= '1';
+    fall_e  <= '1';
     wait for 10 ns;
-    fall  <= '0';
+    fall_e  <= '0';
     wait for 20 ns;
-    rise  <= '1';
+    rise_e  <= '1';
     wait for 10 ns;
-    rise  <= '0';
+    rise_e  <= '0';
     wait;
   end process;
 
@@ -104,11 +112,15 @@ begin
     write (l, String'(" adc_valid_config_i: 0x"));
     hwrite (l, config);
     write (l, String'(" | rising_edge_i: 0x"));
-    write (l, rise);
+    write (l, rise_e);
     write (l, String'(" | falling_edge_i: 0x"));
-    write (l, fall);
+    write (l, fall_e);
     write (l, String'(" || valid_o: "));
     write (l, valid);
+    write (l, String'(" | rising_count_o: 0x"));
+    hwrite (l, r_cnt);
+    write (l, String'(" | falling_count_o: 0x"));
+    hwrite (l, f_cnt);
     if (aresetn = '0') then
       write (l, String'(" (RESET)"));
     end if;
