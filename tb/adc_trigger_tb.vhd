@@ -28,7 +28,7 @@ architecture behaviour of adc_trigger_tb is
   signal aresetn    : std_logic;
   
   signal config     : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
-  signal data_i     : std_logic_vector(12 downto 0) := (others => '0');
+  signal data_i     : std_logic_vector(15 downto 0) := (others => '0');
   signal di         : std_logic_vector(11 downto 0) := (others => '0');
   signal diof       : std_logic := '0';
 
@@ -40,7 +40,7 @@ begin
   uut: adc_trigger port map (
     ACLK              => aclk,
     ARESETN           => aresetn,
-    INT_DATA_I        => data_i,
+    INT_DATA_I        => data_i(12 downto 0),
     ADC_TRIG_CONFIG_I => config,
     RISING_EDGE_O     => rise,
     FALLING_EDGE_O    => fall
@@ -48,6 +48,7 @@ begin
 
   data_i(11 downto 0) <= di;
   data_i(12)          <= diof;
+  data_i(15 downto 13)<= (others => '0');
 
   aresetn_process : process
   begin
@@ -140,5 +141,31 @@ begin
     wait;
   end process;
 
+    output_process : process
+    variable l : line;
+  begin
+    --wait for 1 ns;
+    if (count < 15) then
+      wait for 10 ns;
+    else
+      wait;
+    end if;
+    write (l, String'("c: "));
+    write (l, count, left, 4);
+    --write (l, String'("aclk: "));
+    --write (l, aclk);
+    write (l, String'(" adc_trig_config_i: 0x"));
+    hwrite (l, config);
+    write (l, String'(" | int_data_i: 0x"));
+    hwrite (l, data_i);
+    write (l, String'(" || rising_edge_o: "));
+    write (l, rise);
+    write (l, String'(" | falling_edge_o: "));
+    write (l, fall);
+    if (aresetn = '0') then
+      write (l, String'(" (RESET)"));
+    end if;
+    writeline(output, l);
+  end process;
   
 end behaviour;

@@ -33,8 +33,8 @@ architecture behaviour of adc_input_mux_tb is
   signal test_range : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
   signal look       : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
 
-  signal data_o     : std_logic_vector(12 downto 0) := (others => '0');
-  signal data_i     : std_logic_vector(12 downto 0) := (others => '0');
+  signal data_o     : std_logic_vector(15 downto 0) := (others => '0');
+  signal data_i     : std_logic_vector(15 downto 0) := (others => '0');
   signal di         : std_logic_vector(11 downto 0) := (others => '0');
   signal diof       : std_logic := '0';
 
@@ -43,16 +43,17 @@ begin
   uut: adc_input_mux port map (
     ACLK             => aclk,
     ARESETN          => aresetn,
-    ADC_DATA_I       => data_i,
-    INT_DATA_O       => data_o,
+    ADC_DATA_I       => data_i(12 downto 0),
+    INT_DATA_O       => data_o(12 downto 0),
     ADC_LOOK_O       => look,
     ADC_EN_O         => adc_en,
     ADC_TEST_RANGE_I => test_range,
     ADC_CONFIG_I     => config
   );
 
-  data_i(11 downto 0) <= di;
-  data_i(12)          <= diof;
+  data_i(11 downto  0) <= di;
+  data_i(12)           <= diof;
+  data_i(15 downto 13) <= (others => '0');
 
   aresetn_process : process
   begin
@@ -201,5 +202,33 @@ begin
     wait;
   end process;
 
+  output_process : process
+    variable l : line;
+  begin
+    --wait for 1 ns;
+    if (count < 15) then
+      wait for 10 ns;
+    else
+      wait;
+    end if;
+    write (l, String'("c: "));
+    write (l, count, left, 4);
+    --write (l, String'("aclk: "));
+    --write (l, aclk);
+    --write (l, String'(" | adc_test_range_i: 0x"));
+    --hwrite (l, test_range);
+    write (l, String'(" adc_config_i: 0x"));
+    hwrite (l, config);
+    write (l, String'(" | adc_data_i: 0x"));
+    hwrite (l, data_i);
+    write (l, String'(" || int_data_o: 0x"));
+    hwrite (l, data_o);
+    write (l, String'(" | adc_look_o: 0x"));
+    hwrite (l, look);
+    if (aresetn = '0') then
+      write (l, String'(" (RESET)"));
+    end if;
+    writeline(output, l);
+  end process;
   
 end behaviour;

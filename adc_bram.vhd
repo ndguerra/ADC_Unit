@@ -47,7 +47,7 @@ begin
   rst         <= not ARESETN;
   valid       <= VALID_I;
   
-  BRAM_EN_O   <= BRAM_CONFIG_I(16);--what is this
+  BRAM_EN_O   <= BRAM_CONFIG_I(16);
   BRAM_RST_O  <= rst;
   BRAM_CLK_O  <= clk;
 

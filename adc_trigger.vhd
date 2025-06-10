@@ -83,14 +83,5 @@ begin
       
     end if;
   end process;
-
-  process(clk,rst) -- process for outputting signals 
-  begin
-    if (rst = '1') then
-    elsif (rising_edge(clk)) then
-     
-      
-    end if;
-  end process;
-
+  
 end behavioral;
