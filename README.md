@@ -15,7 +15,7 @@ Besides the enable register, all writable registers have addresses with the firs
  The least significant 13 bits represent the step size we are incrementing in the test pattern output, these 13 bits act as a signed type so the step size can be negative. The middle 3 bits (15-13) represent the options for the mux,
 if these are 0, then the `adc_input_mux` module passes through the ADC input data, if this is set to 1 then the output data of the `adc_input mux` are test patterns defined by this register and the ADC_Test_Range register.
 Every other value for these three bits make this data all zeros.
-* ADC_Test_Range, address `0xD204`, the most significant 16 bits are the upper bound of the test patter, the least significant 16 bits are the lower bound of the test pattern for the `adc_input_mux`.
+* ADC_Test_Range, address `0xD204`, the last 13 bits of the most significant 16 bits are the upper bound of the test patter, the last 13 bits of the least significant 16 bits are the lower bound of the test pattern for the `adc_input_mux`. These values are offset from the ADC data by a value of `0x800`, that is, any lower bound of below this would be considered overflow and would start at `0x1000` until it has surpassed `0x800`. If you want a bound at an ADC value of `0x900`, the corresponding input should be `0x1100`.
 * ADC_Trig_Config, address `0xD208`, bits 27-16 are the 12 bit threshold for the trigger condition, bits 11-0 are the 12 bit swing value for the trigger condition. If the upper or lower bounds resulting from this exceed
   the allowed range, they are set to the maximum or minimum possible values, respectively.
 * ADC_Valid_Config, address `0xD20C`, mostly unused in this version, can be set to all 1's to stop writing to the BRAM.
@@ -31,3 +31,8 @@ Every other value for these three bits make this data all zeros.
 * The `adc_bram` module writes the intermediate data from `adc_input_mux` to the BRAM in one of many ways, specified in the registers section.
 * The `adc_valid` module counts the number of rising and falling edge pulses as supplied by the `adc_trigger` module. It is also responsible for supplying the `adc_bram` module with a valid signal that specifies when the module should
  write the data to the BRAM. Currently, this signal is high, meaning the intermediate data is always written to the BRAM, unless the ADC_Valid_Config register is all ones.
+
+
+## Edge Cases
+* The trigger conditions are inclusive, meaning that if the threshold and swing have values of `0x800` and `0x080` then a rising edge would be found if the data underwent a transition from `0x780` to `0x880`. If the swing is zero, then data at the threshold value is considered lower than the lower bound. That is a theshold and swing value of `0x800` and a `0x000` would trigger a rising edge on the data transition of `0x800` to `0x801`, but would not trigger a falling edge from `0x800` to `0x7FF`.
+* In `adc_input_mux` the test pattern data will reset to the higher bound when the step is at or above the 13 bit value of `0x1000` and the lower bound when it is less that this. The data is reset if one clock cycle of data is out of this range. However, if the step is large enough to transition the data from below the higher bound, to above the lower bound (as the carry bit will be lost) then the data will not be reset.
