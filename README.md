@@ -1,4 +1,6 @@
-Currently, the top level module `adc_unit` contains 5 submodules. The `adc_registers` module is used with a register bus to configure the `adc_unit`. The addresses of this register bus are 16 bits,
+Currently, the top level module `adc_unit` contains 5 submodules. 
+## Registers:
+The `adc_registers` module is used with a register bus to configure the `adc_unit` from the Linux driver. The addresses of this register bus are 16 bits,
 with all the registers in this module having the first 4 bits `0xD`. The enable register, at `0xD000` should have its last two bits written to 1 to enable the BRAM and ADC. The read only registers of this module,
 which check on the internals of `adc_unit`, all have addresses with the first 8 bits `0xD1`. These registers are described as follows: 
 * Look register, address `0xD100`, is updated with the registered ADC data every clock cycle
@@ -22,3 +24,10 @@ Every other value for these three bits make this data all zeros.
   13 bits of the address given with the remaining bits set to 0, a value of 2 will store 13 bits of data in both the upper and lower 16 bits of the address, and a value of 3 will store the most significant 8 bits of data in one of the
   four byters at the given address. For the bit packing modes, the write enable determines where in the BRAM addresss we write our data.
 
+## Modules:
+* The `adc_registers` module lets us write registers from the linux driver.
+* The `adc_input_mux` module inputs ADC data, registers it, and send it to the look register. This module then outputs intermediate data that is used by other modules. This intermediate data is either the ADC data or the test patterns.
+* The `adc_trigger` module detects rising and falling edges of the intermediate data. It outpus rising and falling edge pulses when a rising or falling edge is detected, respectively.
+* The `adc_bram` module writes the intermediate data from `adc_input_mux` to the BRAM in one of many ways, specified in the registers section.
+* The `adc_valid` module counts the number of rising and falling edge pulses as supplied by the `adc_trigger` module. It is also responsible for supplying the `adc_bram` module with a valid signal that specifies when the module should
+ write the data to the BRAM. Currently, this signal is high, meaning the intermediate data is always written to the BRAM, unless the ADC_Valid_Config register is all ones.
