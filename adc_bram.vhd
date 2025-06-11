@@ -18,7 +18,7 @@ entity adc_bram is
     LAST_O         : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     
     -- BRAM
-    BRAM_EN_O      : out std_logic; 
+    --BRAM_EN_O      : out std_logic; 
     BRAM_DATA_O    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
     BRAM_WEN_O     : out std_logic_vector(3 downto 0);
     BRAM_ADDR_O    : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);
@@ -47,7 +47,7 @@ begin
   rst         <= not ARESETN;
   valid       <= VALID_I;
   
-  BRAM_EN_O   <= BRAM_CONFIG_I(16);
+  --BRAM_EN_O   <= BRAM_CONFIG_I(16);
   BRAM_RST_O  <= rst;
   BRAM_CLK_O  <= clk;
 

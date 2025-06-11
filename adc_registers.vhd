@@ -8,7 +8,8 @@ entity adc_registers is
   generic (
     C_SCOPE                : integer  := 16#D#;
 
-    C_REG_ADC_COMMANDS     : integer  := 16#000#; -- WO
+    C_REG_ENABLES          : integer  := 16#000#; -- RW
+    C_REG_ADC_COMMANDS     : integer  := 16#004#; -- WO
     
     C_REG_ADC_LOOK         : integer  := 16#100#; -- RO
     C_REG_RISING_COUNT     : integer  := 16#104#; -- RO
@@ -39,6 +40,10 @@ entity adc_registers is
     S_REGBUS_RB_WADDR	: in  std_logic_vector(C_RB_ADDR_WIDTH-1 downto 0);
     S_REGBUS_RB_WDATA	: in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
     S_REGBUS_RB_WACK    : out std_logic;
+
+    -- Enables
+    BRAM_EN_O           : out std_logic;
+    ADC_EN_O            : out std_logic;
 
     -- Commands
     COMMAND_0_O         : out std_logic;
@@ -79,6 +84,7 @@ architecture behavioral of adc_registers is
 
   -- command signals
   signal commands : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+  signal enables  : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
 
   -- output registers 
   signal adc_config   : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
@@ -106,6 +112,9 @@ begin
   wupdate  <= S_REGBUS_RB_WUPDATE;
   waddr    <= S_REGBUS_RB_WADDR;
   wdata    <= S_REGBUS_RB_WDATA;
+
+  ADC_EN_O  <= enables(0);
+  BRAM_EN_O <= enables(1);
 
   -- Commands
   COMMAND_0_O <= commands(0);
@@ -138,8 +147,11 @@ begin
           scope := to_integer(unsigned(raddr(15 downto 12)));
           reg   := to_integer(unsigned(raddr(11 downto 0)));
           if (scope=C_SCOPE) then
+            if (reg=C_REG_ENABLES) then
+              rdata <= enables;
+              rack <= '1';
             -- RO registers
-            if (reg=C_REG_ADC_LOOK) then
+            elsif (reg=C_REG_ADC_LOOK) then
               rdata <= ADC_LOOK_I;
               rack  <= '1';
             elsif (reg=C_REG_RISING_COUNT) then
@@ -231,6 +243,9 @@ begin
               wack         <= '1';
             elsif (reg=C_REG_ADC_COMMANDS) then
               commands     <= wdata;
+              wack         <= '1';
+            elsif (reg=C_REG_ENABLES) then
+              enables      <= wdata;
               wack         <= '1';
             elsif (reg=C_REG_ADC_SCRATCH) then
               scratch      <= wdata;

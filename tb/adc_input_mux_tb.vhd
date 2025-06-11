@@ -19,7 +19,7 @@ architecture behaviour of adc_input_mux_tb is
       ADC_DATA_I       : in  std_logic_vector(ADC_DATA_WIDTH downto 0);
       INT_DATA_O       : out std_logic_vector(ADC_DATA_WIDTH downto 0);
       ADC_LOOK_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
-      ADC_EN_O         : out std_logic;
+      --ADC_EN_O         : out std_logic;
 
       ADC_TEST_RANGE_I : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
       ADC_CONFIG_I     : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0)
@@ -38,7 +38,7 @@ architecture behaviour of adc_input_mux_tb is
   signal di         : std_logic_vector(11 downto 0) := (others => '0');
   signal diof       : std_logic := '0';
 
-  signal adc_en     : std_logic;
+  --signal adc_en     : std_logic;
 begin
   uut: adc_input_mux port map (
     ACLK             => aclk,
@@ -46,7 +46,7 @@ begin
     ADC_DATA_I       => data_i(12 downto 0),
     INT_DATA_O       => data_o(12 downto 0),
     ADC_LOOK_O       => look,
-    ADC_EN_O         => adc_en,
+    --ADC_EN_O         => adc_en,
     ADC_TEST_RANGE_I => test_range,
     ADC_CONFIG_I     => config
   );

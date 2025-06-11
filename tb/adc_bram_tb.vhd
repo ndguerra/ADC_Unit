@@ -25,7 +25,7 @@ architecture behaviour of adc_bram_tb is
       LAST_O         : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
       
       -- BRAM
-      BRAM_EN_O      : out std_logic; 
+      --BRAM_EN_O      : out std_logic; 
       BRAM_DATA_O    : out std_logic_vector(BRAM_DATA_WIDTH-1 downto 0);
       BRAM_WEN_O     : out std_logic_vector(3 downto 0);
       BRAM_ADDR_O    : out std_logic_vector(BRAM_ADDR_WIDTH-1 downto 0);

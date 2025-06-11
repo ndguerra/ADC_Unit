@@ -12,7 +12,7 @@ entity adc_input_mux is
     ADC_DATA_I       : in  std_logic_vector(ADC_DATA_WIDTH downto 0);
     INT_DATA_O       : out std_logic_vector(ADC_DATA_WIDTH downto 0) := (others => '0');
 
-    ADC_EN_O         : out std_logic;
+    --ADC_EN_O         : out std_logic;
 
     --regbus
     ADC_LOOK_O       : out std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
@@ -24,7 +24,7 @@ end entity adc_input_mux;
 architecture behavioral of adc_input_mux is
   signal clk      : std_logic;
   signal rst      : std_logic;
-  signal adc_en   : std_logic := '0';
+  --signal adc_en   : std_logic := '0';
   signal adc_data : std_logic_vector(12 downto 0) := (others => '0');
   signal wait_t   : std_logic_vector(15 downto 0) := (others => '0');
   signal mode     : std_logic_vector(1  downto 0) := (others => '0');
@@ -40,7 +40,7 @@ begin
   lower    <= ADC_TEST_RANGE_I(12 downto  0);
 
   wait_t   <= ADC_CONFIG_I(31 downto 16);
-  ADC_EN_O <= ADC_CONFIG_I(15);
+  --ADC_EN_O <= ADC_CONFIG_I(15);
   mode     <= ADC_CONFIG_I(14 downto 13);
   step     <= ADC_CONFIG_I(12 downto  0);
 

@@ -26,6 +26,10 @@ architecture behaviour of adc_registers_tb is
       S_REGBUS_RB_WDATA	   : in  std_logic_vector(C_RB_DATA_WIDTH-1 downto 0);
       S_REGBUS_RB_WACK     : out std_logic;
 
+      -- Enables
+      BRAM_EN_O           : out std_logic;
+      ADC_EN_O            : out std_logic;
+
       -- Commands
       COMMAND_0_O         : out std_logic;
       COMMAND_1_O         : out std_logic;
@@ -56,6 +60,10 @@ architecture behaviour of adc_registers_tb is
   signal trig_config  : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
   signal valid_config : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
   signal bram_config  : std_logic_vector(C_RB_DATA_WIDTH-1 downto 0) := (others => '0');
+
+  -- enables
+  signal bram_en      : std_logic := '0';
+  signal adc_en       : std_logic := '0';
   -- commands
   signal command0     : std_logic := '0';
   signal command1     : std_logic := '0';
@@ -85,6 +93,9 @@ begin
       S_REGBUS_RB_WADDR   => waddr,
       S_REGBUS_RB_WDATA   => wdata,
       S_REGBUS_RB_WACK    => wack,
+
+      BRAM_EN_O           => bram_en,
+      ADC_EN_O            => adc_en,
 
       COMMAND_0_O         => command0,
       COMMAND_1_O         => command1,
