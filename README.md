@@ -20,7 +20,7 @@ Every other value for these three bits make this data all zeros.
   the allowed range, they are set to the maximum or minimum possible values, respectively.
 * ADC_Valid_Config, address `0xD20C`, mostly unused in this version, can be set to all 1's to stop writing to the BRAM.
 * BRAM_Config, the least signficant 11 bits are the number of addresses to write to while using the bram as a circular buffer (in previous version this was the 13 bit number corresponding the the maximum address we would write to,
-  but for simplicity, we have removed the last 2 bits), the next hexadecimal digit, bits 15-12, represent the amount of bit packing. A value of 0 will not output anything to the BRAM, a value of 1 will store the data at the least significant
+  but for simplicity, we have removed the last 2 bits), if this is set to 0, the entire circular buffer is used. The next hexadecimal digit, bits 15-12, represent the amount of bit packing. A value of 0 will not output anything to the BRAM, a value of 1 will store the data at the least significant
   13 bits of the address given with the remaining bits set to 0, a value of 2 will store 13 bits of data in both the upper and lower 16 bits of the address, and a value of 3 will store the most significant 8 bits of data in one of the
   four byters at the given address. For the bit packing modes, the write enable determines where in the BRAM addresss we write our data.
 
