@@ -88,6 +88,8 @@ begin
             int_data(10 downto 0) <= std_logic_vector(value(10 downto 0));
           end if;
         end if;
+      else
+        int_data <= (others => '0');
       end if;
     end if;
   end process;
