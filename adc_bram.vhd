@@ -139,7 +139,7 @@ begin
       if (rising_edge(clk)) then
         if (wen /= x"0") then
           stat(10 downto 0) <= addr;
-          stat(19 downto 16) <= wen;
+          stat(15 downto 12) <= wen;
           last <= data;
         end if;
       end if;
